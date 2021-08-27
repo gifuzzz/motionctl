@@ -1,9 +1,11 @@
 from socket import socket, AF_INET, SOCK_DGRAM
 from os import system
+from sys import path
 
 FLASK_HOST = '0.0.0.0'
 PORT = 8000
-VIDEO_PATH = '/var/lib/motion'
+VIDEO_DIRECTORY = '/var/lib/motion'
+APP_DIRECTORY = path[0]
 VIDEO_EXTENSION = 'mkv'
 
 # If you have a static ip or stream address you can remove this part

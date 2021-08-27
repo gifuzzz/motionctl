@@ -3,14 +3,14 @@ from flask import Flask, render_template, url_for
 from re import findall
 import os
 from subprocess import call
-from config import STREAM_ADDRESS, VIDEO_PATH, FLASK_HOST, PORT
+from config import STREAM_ADDRESS, VIDEO_DIRECTORY, APP_DIRECTORY, FLASK_HOST, PORT
 
 # change direcotory in order to get video size
-os.chdir(VIDEO_PATH)
 
-app = Flask(__name__, static_folder=VIDEO_PATH)
+app = Flask(__name__, static_folder=VIDEO_DIRECTORY)
 
 def getFiles():
+    os.chdir(VIDEO_DIRECTORY)
     dic = {}
     files = os.listdir()
     if len(files):
@@ -40,6 +40,7 @@ def getFiles():
                 dic[day] = {}
 
             dic[day][time_] = [urlFor, size]
+    os.chdir(APP_DIRECTORY)
     return dic
 
 @app.route('/')
@@ -50,7 +51,7 @@ def index():
 @app.route('/delete/<video>')
 def delete(video):
     print('Deleting ' + video)
-    call('sudo rm ' + os.path.join(VIDEO_PATH, video), shell=True)
+    call('sudo rm ' + os.path.join(VIDEO_DIRECTORY, video), shell=True)
     return 'deleted'
 
 if __name__ == '__main__':
