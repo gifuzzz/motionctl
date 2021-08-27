@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <title>Stream</title>
+    </head>
+    <body>
+        <table>
+            <thead>
+                <th class="h2">Stream</th>
+                <th class="h2">Video</th>
+            </thead>
+            <tr>
+              <td>
+                <a href="{{ address }}">
+                  <img src="{{ address }}" border="0"/>
+                </a>
+              </td>
+              <td>
+                <video id='video' controls>
+                  <source id="source"></source>
+                </video>
+              </td>
+            </tr>
+            <tr>
+                <td>
+                    <a id='delete'>Delete</a>
+                    <a id='previous' class='disabled'>Previous</a>
+                    <a id='next' class='disabled'>Next</a>
+                </td>
+            </tr>
+        </table>
+        <p class="h2">Videos</p>
+        <p id="currvideo"></p>
+        <div>
+            <table>
+                <tbody>
+                    {% for giorno in files %}
+                        <td>
+                            <table style="border-left: black 1px solid;">
+                                <thead>
+                                    <th style="border-bottom: black 1px solid;">{{giorno}}</th>
+                                </thead>
+                                <tbody>
+                                    {% for orario in files[giorno] %}
+                                        <tr>
+                                            <td>
+                                                <a name="{{files[giorno][orario][0]}}">{{orario}} | {{files[giorno][orario][1]}}</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+    <script>
+        var tables = document.getElementsByTagName('table');
+        tables[2].style["border"] = '1px solid transparent';
+        $("a").click(function() {
+            if(this.id != 'delete' && this.id != 'previous' && this.id != 'next'){
+                var currvideo = document.getElementById('currvideo');
+                var source = document.getElementById('source');
+
+                source.setAttribute('src', this.name);
+                currvideo.textContent = 'Current Video: ' + this.textContent
+                video.load();
+                video.play();
+
+                $('a').removeClass('current')
+                $(this).addClass('current')
+
+                $('#previous').removeClass('disabled');
+                $('#next').removeClass('disabled');
+
+                var index = $('a').index(this);
+                if (index == 4){
+                    $('#previous').addClass('disabled');
+
+                } else if (index == $('a').length-1){
+                    $('#next').addClass('disabled');
+
+                }
+            }
+        });
+
+        $('#previous').click(() => {
+            var index = $('a').index($('.current'));
+            if (index != 4) {
+                var new_video = $('a')[index-1];
+                new_video.click();
+            }
+        })
+
+        $('#next').click(() => {
+            var index = $('a').index($('.current'));
+            if (index != $('a').length-1){
+                var new_video = $('a')[index+1];
+                new_video.click();
+            }
+        })
+
+        $('#delete').click(() => {
+            var src = $('#source').attr('src').split('/');
+            var video = src[src.length-1];
+
+            var conferma = confirm("Sei sicuro di voler rimuovere " + video + "? L'operazione è irreversibile")
+
+            if(conferma){
+                $.ajax({
+                    type: "GET",
+                    url: 'delete/' + video,
+                    success: function(result) {
+                        location.reload()
+                    },
+                    error: function(result) {
+                        alert('error: ' + result);
+                    }
+                });
+            }
+        })
+    </script>
+</html>
+
+<style>
+    body {
+        margin: 1.5%;
+        font-family: "-apple-system,BlinkMacSystemFont","Segoe UI","Roboto","Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        text-align: left;
+    }
+
+    tbody {
+        vertical-align: text-top;
+    }
+
+    #currvideo {
+        margin: 0px;
+    }
+
+    .h2 {
+        font-size: 2rem;
+        font-weight: 100;
+        margin-bottom: 0;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        color: #0056b3;
+        text-decoration-line: underline;
+        text-decoration-style: initial;
+        text-decoration-color: initial;
+    }
+
+    a.current {
+        color: #00b008;
+    }
+
+    a.disabled {
+        cursor: not-allowed;
+        text-decoration: none;
+        opacity: 0.5;
+    }
+
+    #delete {
+        color: #ff0000;
+    }
+
+    #delete:hover {
+        color:rgb(175, 0, 0)
+    }
+
+    td img, td video {
+        max-width: 49vw;
+    }
+</style>
