@@ -14,10 +14,9 @@ def getFiles():
     dic = {}
     files = os.listdir()
     if len(files):
+        files.remove('lastsnap.jpg') # lastsnap.jpg gives error
         files.sort(key=os.path.getctime)
         for i in files:
-            if i == 'lastsnap.jpg':
-                continue
 
             urlFor = url_for('static', filename=i)
 
